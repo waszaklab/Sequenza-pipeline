@@ -36,7 +36,7 @@ inputs:
   unmatched-normal:
     type: boolean?
     inputBinding:
-        position 4
+        position: 4
         prefix: -u
   reference-fasta:
     type: File
