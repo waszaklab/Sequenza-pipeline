@@ -7,7 +7,7 @@ label: Sequenza-command
 
 requirements:
   DockerRequirement:
-    dockerPull: mfrkn/sequenza-pipeline:v0.1
+    dockerPull: chrimbu/sequenza-pipeline:v0.2
   ResourceRequirement:
     ramMin: 8192
 
@@ -33,17 +33,22 @@ inputs:
       prefix: -n
     secondaryFiles:
       - .bai
+  unmatched-normal:
+    type: boolean?
+    inputBinding:
+        position 4
+        prefix: -u
   reference-fasta:
     type: File
     inputBinding:
-      position: 4
+      position: 5
       prefix: -r
     secondaryFiles:
       - .fai
   num-threads:
     type: int
     inputBinding:
-      position: 5
+      position: 6
       prefix: -c
 
 outputs:
