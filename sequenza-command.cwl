@@ -33,11 +33,12 @@ inputs:
       prefix: -n
     secondaryFiles:
       - .bai
-  unmatched-normal:
-    type: boolean?
+  normal-type:
+    type: string?
+    default: 'matched'
     inputBinding:
         position: 4
-        prefix: -u
+        prefix: -y
   reference-fasta:
     type: File
     inputBinding:

@@ -8,31 +8,38 @@ set -eu
 usage() {
   cat << EOS
 Usage: `basename $0` [options]
-  -s SAMPLE_ID    Sample ID (required)
-  -t TUMOR_BAM    Tumor BAM file (required)
-  -n NORMAL_BAM   Normal BAM file (required)
-  -u              Unmatched normal (optional; default unset)
-  -r REF_FASTA    FASTA file of GRCh37 (required)
-  -c THREADS      The number of threads (optional; default 1)
-  -h              Display help message
+  -s SAMPLE_ID           Sample ID (required)
+  -t TUMOR_BAM           Tumor BAM file (required)
+  -n NORMAL_BAM          Normal BAM file (required)
+  -r REF_FASTA           FASTA file of GRCh37 (required)
+  -y matched, unmatched  Type of normal (optional; default matched)
+  -c THREADS             The number of threads (optional; default 1)
+  -h                     Display help message
 EOS
   exit 1
 }
 
 num_threads=1
-unmatched_normal=0
-while getopts s:t:n:u:r:c:h OPT; do
+normal_type="matched"
+while getopts s:t:n:y:r:c:h OPT; do
   case $OPT in
     s ) sample_id=$OPTARG;;
     t ) tumor_bam=$OPTARG;;
     n ) normal_bam=$OPTARG;;
-    u ) unmatched_normal=1;;
+    y ) normal_type=$OPTARG;;
     r ) reference_fasta=$OPTARG;;
     c ) num_threads=$OPTARG;;
     h ) usage;;
     ? ) usage;;
   esac
 done
+
+
+if [[ "$normal_type" != "matched" && "$normal_type" != "unmatched" ]]
+then
+    >&2 echo "Invalid input: -y can only be set to 'matched' or 'unmatched'."
+    exit 1
+fi
 
 #
 # compute GC contents
@@ -46,9 +53,9 @@ gc_wiggle="${reference_base}.gc50Base.wig.gz"
 #
 chromosomes="1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X Y"
 
-if [ $unmatched_normal -eq 1 ]
+if [ $normal_type == "unmatched" ]
 then
-    echo "Un-matched normal mode"
+    echo "Unmatched normal mode"
     sequenza-utils bam2seqz -n ${normal_bam} -t ${tumor_bam} \
         --fasta ${reference_fasta} -gc ${gc_wiggle} -o ${sample_id}.seqz.gz \
          -C ${chromosomes} --parallel ${num_threads}
