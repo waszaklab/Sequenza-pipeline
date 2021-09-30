@@ -59,6 +59,10 @@ then
     sequenza-utils bam2seqz -n ${tumor_bam} -t ${tumor_bam} -n2 ${normal_bam} \
         --fasta ${reference_fasta} -gc ${gc_wiggle} -o ${sample_id}.seqz.gz \
          -C ${chromosomes} --parallel ${num_threads}
+    # Unmatched normal processing will not create *_mutation.txt files,
+    # but it is an output in matched normal processing and the CWL
+    # requires this output
+    touch empty_mutations.txt
 else
     echo "Matched normal mode"
     sequenza-utils bam2seqz -n ${normal_bam} -t ${tumor_bam} \
