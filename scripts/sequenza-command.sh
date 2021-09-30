@@ -56,12 +56,12 @@ chromosomes="1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X Y"
 if [ $normal_type == "unmatched" ]
 then
     echo "Unmatched normal mode"
-    sequenza-utils bam2seqz -n ${normal_bam} -t ${tumor_bam} \
+    sequenza-utils bam2seqz -n ${tumor_bam} -t ${tumor_bam} -n2 ${normal_bam} \
         --fasta ${reference_fasta} -gc ${gc_wiggle} -o ${sample_id}.seqz.gz \
          -C ${chromosomes} --parallel ${num_threads}
 else
     echo "Matched normal mode"
-    sequenza-utils bam2seqz -n ${tumor_bam} -t ${tumor_bam} -n2 ${normal_bam} \
+    sequenza-utils bam2seqz -n ${normal_bam} -t ${tumor_bam} \
         --fasta ${reference_fasta} -gc ${gc_wiggle} -o ${sample_id}.seqz.gz \
          -C ${chromosomes} --parallel ${num_threads}
 fi
