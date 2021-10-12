@@ -7,7 +7,7 @@ label: Sequenza-command
 
 requirements:
   DockerRequirement:
-    dockerPull: chrimbu/sequenza-pipeline:v0.5
+    dockerPull: chrimbu/sequenza-pipeline:v0.6
   ResourceRequirement:
     ramMin: 8192
 
@@ -46,10 +46,22 @@ inputs:
       prefix: -r
     secondaryFiles:
       - .fai
+  hom_threshold:
+    type: float?
+    doc: 'Threshold to select homozygous positions, e.g. 0.9'
+    inputBinding:
+      position: 6
+      prefix: -o
+  het_threshold:
+    type: float?
+    doc: 'Threshold to select heterozygous positions, e.g. 0.25'
+    inputBinding:
+      position: 7
+      prefix: -e
   num-threads:
     type: int
     inputBinding:
-      position: 6
+      position: 8
       prefix: -c
 
 outputs:
