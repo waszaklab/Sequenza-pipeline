@@ -7,7 +7,7 @@ label: Sequenza-command
 
 requirements:
   DockerRequirement:
-    dockerPull: chrimbu/sequenza-pipeline:v0.6
+    dockerPull: chrimbu/sequenza-pipeline:v0.7
   ResourceRequirement:
     ramMin: 8192
 
@@ -18,7 +18,7 @@ inputs:
     type: string
     inputBinding:
       position: 1
-      prefix: -s
+      prefix: -i
   tumor-bam:
     type: File
     inputBinding:
@@ -39,10 +39,16 @@ inputs:
     inputBinding:
         position: 4
         prefix: -y
+  sex:
+    type: string?
+    default: 'female'
+    inputBinding:
+        position: 5
+        prefix: -s
   reference-fasta:
     type: File
     inputBinding:
-      position: 5
+      position: 6
       prefix: -r
     secondaryFiles:
       - .fai
@@ -50,19 +56,31 @@ inputs:
     type: float?
     doc: 'Threshold to select homozygous positions, e.g. 0.9'
     inputBinding:
-      position: 6
+      position: 7
       prefix: -o
   het_threshold:
     type: float?
     doc: 'Threshold to select heterozygous positions, e.g. 0.25'
     inputBinding:
-      position: 7
+      position: 8
       prefix: -e
+  cellularity:
+    type: string?
+    doc: 'Candidate cellularity values. Single value (e.g. 0.8) or MIN,MAX,STEP (e.g. 0.1,1,0.01)'
+    inputBinding:
+        position: 9
+        prefix: -c
+  ploidy:
+    type: string?
+    doc: 'Candidate ploidy values. Single value (e.g. 2) or MIN,MAX,STEP (e.g. 1,7,0.1)'
+    inputBinding:
+        position: 10
+        prefix: -p
   num-threads:
     type: int
     inputBinding:
-      position: 8
-      prefix: -c
+      position: 11
+      prefix: -d
 
 outputs:
   seqz:

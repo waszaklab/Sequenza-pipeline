@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y \
     r-base \
     libcurl4-openssl-dev
 
-RUN R -q -e "setRepositories(graphics = FALSE, ind = 1:6); install.packages(\"sequenza\")"
+RUN R -q -e "setRepositories(graphics = FALSE, ind = 1:6); install.packages(c(\"sequenza\", \"optparse\"))"
 RUN pip install sequenza-utils
 
 COPY scripts/sequenza-command.sh \

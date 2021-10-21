@@ -1,40 +1,49 @@
 #!/bin/bash
-
 set -eu
 
-#
-# parse args
-#
+# Usage
 usage() {
   cat << EOS
 Usage: `basename $0` [options]
-  -s SAMPLE_ID           Sample ID (required)
+  -i SAMPLE_ID           Sample ID (required)
   -t TUMOR_BAM           Tumor BAM file (required)
   -n NORMAL_BAM          Normal BAM file (required)
   -r REF_FASTA           FASTA file of GRCh37 (required)
-  -y matched, unmatched  Type of normal (optional; default matched)
+  -y NORMAL_TYPE         Type of normal (optional; default matched)
+  -s SEX                 Sex of donor. One of female, male (optional, default: female)
   -o HOM                 Threshold to select homozygous positions (optional, default see sequenza-utils)
   -e HET                 Threshold to select heterozygous positions (optional, default see sequenza-utils)
-  -c THREADS             The number of threads (optional; default 1)
+  -c CELLULARITY         Candidate cellularity values. Single value or MIN,MAX,STEP (optional, default see sequenza-command.R)
+  -p PLOIDY              Candidate ploidy values. Single value or MIN,MAX,STEP (optional, default see sequenza-command.R)  
+  -d THREADS             The number of threads (optional; default 1)
   -h                     Display help message
 EOS
   exit 1
 }
 
+# Defaults
 num_threads=1
 normal_type="matched"
 hom=""
 het=""
-while getopts s:t:n:y:r:o:e:c:h OPT; do
+cellularity=""
+ploidy=""
+sex="female"
+
+# Parse argumnets
+while getopts i:t:n:y:r:s:o:e:c:p:d:h OPT; do
   case $OPT in
-    s ) sample_id=$OPTARG;;
+    i ) sample_id=$OPTARG;;
     t ) tumor_bam=$OPTARG;;
     n ) normal_bam=$OPTARG;;
     y ) normal_type=$OPTARG;;
     r ) reference_fasta=$OPTARG;;
+    s ) sex=$OPTARG;;
     o ) hom=$OPTARG;;
     e ) het=$OPTARG;;
-    c ) num_threads=$OPTARG;;
+    c ) cellularity=$OPTARG;;    
+    p ) ploidy=$OPTARG;;        
+    d ) num_threads=$OPTARG;;
     h ) usage;;
     ? ) usage;;
   esac
@@ -43,7 +52,13 @@ done
 
 if [[ "$normal_type" != "matched" && "$normal_type" != "unmatched" ]]
 then
-    >&2 echo "Invalid input: -y can only be set to 'matched' or 'unmatched'."
+    >&2 echo "Invalid input: Normal type (-y) can only be set to 'matched' or 'unmatched'."
+    exit 1
+fi
+
+if [[ "$sex" != "male" && "$sex" != "female" ]]
+then
+    >&2 echo "Invalid input: Sex (-s) can only be set to 'male' or 'female'."
     exit 1
 fi
 
@@ -84,17 +99,31 @@ else
          -C ${chromosomes} --parallel ${num_threads} ${opt_param_str}
 fi
 
-
 {
-  for chr in $chromosomes; do
-    if [[ $chr = "1" ]]; then
-      zcat ${sample_id}_1.seqz.gz
-    else
-      zcat ${sample_id}_${chr}.seqz.gz | tail -n +2
-    fi
-  done
+ for chr in $chromosomes; do
+   if [[ $chr = "1" ]]; then
+     zcat ${sample_id}_1.seqz.gz
+   else
+     zcat ${sample_id}_${chr}.seqz.gz | tail -n +2
+   fi
+ done
 } | sequenza-utils seqz_binning --seqz - -w 50 \
-  -o ${sample_id}.small.seqz.gz
+ -o ${sample_id}.small.seqz.gz
 
-Rscript /opt/sequenza-command.R ${sample_id} ${sample_id}.small.seqz.gz
+opt_sequenza_param_str=''
+if [[ "$sex" != "" ]]; then
+    opt_sequenza_param_str="$opt_sequenza_param_str --sex $sex"
+fi
+if [[ "$cellularity" != "" ]]; then
+    opt_sequenza_param_str="$opt_sequenza_param_str --cellularity $cellularity"
+fi
+if [[ "$ploidy" != "" ]]; then
+    opt_sequenza_param_str="$opt_sequenza_param_str --ploidy $ploidy"
+fi
+
+Rscript /opt/sequenza-command.R \
+    --id ${sample_id} \
+    --seqz-file ${sample_id}.small.seqz.gz \
+    $opt_sequenza_param_str
+    
 rm ${sample_id}.small.seqz.gz
