@@ -7,7 +7,7 @@ label: Sequenza-command
 
 requirements:
   DockerRequirement:
-    dockerPull: chrimbu/sequenza-pipeline:v0.7
+    dockerPull: chrimbu/sequenza-pipeline:v0.8
   ResourceRequirement:
     ramMin: 8192
 

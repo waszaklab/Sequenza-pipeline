@@ -51,5 +51,5 @@ message(sprintf('ploidy: %s', paste(ploidy, collapse=',')))
 
 seqz <- sequenza.extract(seqz.file, verbose = FALSE)
 cp.table <- sequenza.fit(seqz, cellularity=cellularity, ploidy=ploidy, female=female)
-sequenza.results(sequenza.extract = seqz,
-    cp.table = cp.table, sample.id = sample.id)
+sequenza.results(sequenza.extract = seqz, cp.table = cp.table, female=female, 
+                 sample.id = sample.id)
