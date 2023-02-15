@@ -7,7 +7,7 @@ label: Sequenza-command
 
 requirements:
   DockerRequirement:
-    dockerPull: waszaklab/sequenza-pipeline:v0.8
+    dockerPull: waszaklab/sequenza-pipeline:v0.9
   ResourceRequirement:
     ramMin: 8192
 
