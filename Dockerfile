@@ -1,12 +1,12 @@
-FROM ubuntu:18.04
+FROM ubuntu:23.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y \
     samtools \
     tabix \
-    python \
-    python-pip \
+    python3 \
+    python3-pip \
     r-base \
     libcurl4-openssl-dev
 
